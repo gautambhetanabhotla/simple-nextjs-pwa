@@ -9,6 +9,9 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  image: {
+    type: Buffer,
+  },
 });
 
 export default mongoose.models.User || mongoose.model("User", userSchema);
