@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       },
     );
   } catch (e) {
-    console.log((e as Error).message);
+    console.log((e as Error).name);
     if ((e as Error).name === "ValidationError") {
       return NextResponse.json(
         {
@@ -30,6 +30,16 @@ export async function POST(request: NextRequest) {
         },
         {
           status: 400, // Bad Request
+        },
+      );
+    } else if ((e as Error).name === "MongoServerError") {
+      console.dir(e);
+      return NextResponse.json(
+        {
+          message: "Email already exists",
+        },
+        {
+          status: 409, // Conflict
         },
       );
     }

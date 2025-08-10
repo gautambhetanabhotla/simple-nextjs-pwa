@@ -9,18 +9,19 @@ import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
-  CardDescription,
+  // CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { toast } from "sonner";
 import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -30,7 +31,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    // setError("");
 
     try {
       const result = await signIn("credentials", {
@@ -38,14 +39,17 @@ export default function LoginPage() {
         password,
         redirect: false,
       });
+      console.dir(result);
 
       if (result?.error) {
-        setError("Invalid email or password");
+        // setError("Invalid email or password");
+        toast.error(result.error);
       } else {
         router.push(callbackUrl);
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      // setError("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

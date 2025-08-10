@@ -4,6 +4,17 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: true,
+    unique: true,
+    validate: {
+      validator: (v: string) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      },
+      message: () => "Invalid email",
+    },
+  },
+  name: {
+    type: String,
+    required: true,
   },
   passwordHash: {
     type: String,
