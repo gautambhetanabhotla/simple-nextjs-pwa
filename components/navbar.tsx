@@ -3,14 +3,14 @@
 import { User2 as UserIcon } from "lucide-react";
 import {
   NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
+  // NavigationMenuContent,
+  // NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
-  navigationMenuTriggerStyle,
+  // NavigationMenuTrigger,
+  // NavigationMenuViewport,
+  // navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -23,6 +23,42 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+function AvatarDropdown() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  // No need for useEffect; React automatically re-renders when `status` changes
+  // because `useSession` is a hook and `status` is a state value.
+
+  if (session)
+    return (
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>{session.user!.name}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>Profile</DropdownMenuItem>
+        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive" onClick={() => signOut()}>
+          Sign Out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    );
+  else
+    return (
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Not signed in</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={() => router.push("/login")}
+        >
+          Sign In
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    );
+}
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -55,16 +91,7 @@ export default function Navbar() {
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive" onClick={() => signOut()}>
-            Sign Out
-          </DropdownMenuItem>
-        </DropdownMenuContent>
+        <AvatarDropdown />
       </DropdownMenu>
     </div>
   );

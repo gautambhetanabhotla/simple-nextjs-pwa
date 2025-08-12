@@ -1,38 +1,36 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Loader from "@/components/loader";
 
 export default function Home() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
+  const [manualLoading, setManualLoading] = useState(true);
+  const router = useRouter();
 
-  if (status === "loading") {
-    return <div>Loading...</div>;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setManualLoading(false);
+    }, 3000);
+    if (status === "unauthenticated") router.push("/login");
+    return () => clearTimeout(timer);
+  }, [status, router]);
+
+  if (status === "loading" || manualLoading) {
+    return <Loader />;
   }
-
-  if (status === "unauthenticated") {
-    return (
-      <div>
-        <h1>Welcome to the Grievance Portal</h1>
-        <p>
-          Please <a href="/login">sign in</a> to continue.
-        </p>
-      </div>
-    );
-  }
-
-  // session.user will contain the data you returned from authorize()
   return (
     <>
-      <div className="flex justify-between items-center mb-4">
-        <h1>Welcome to the Grievance Portal</h1>
-        <div className="flex items-center gap-4">
-          <span>Hello, {session!.user!.email}</span>
-          <Button onClick={() => signOut()}>Sign Out</Button>
+      <div className="min-h-screen w-full flex flex-col justify-center items-center gap-y-4">
+        <p className="text-3xl px-5">What&apos;s bothering you today?</p>
+        <div className="w-[85%] max-w-4xl">
+          <Textarea placeholder="Describe your grievance..." />
         </div>
       </div>
-      <Textarea placeholder="Describe your grievance..." />
     </>
   );
 }

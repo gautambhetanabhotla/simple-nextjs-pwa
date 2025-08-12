@@ -28,12 +28,35 @@ const handler = NextAuth({
         }
         return {
           id: user._id.toString(),
+          name: user.name,
           email: user.email,
           image: user.image,
         };
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      // When user signs in, add user data to token
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.image = user.image;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Send properties to the client
+      if (token && session.user) {
+        session.user.id = token.id as string;
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
+        session.user.image = token.image as string;
+      }
+      return session;
+    },
+  },
   session: {
     strategy: "jwt",
     maxAge: 24 * 60 * 60, // in seconds
