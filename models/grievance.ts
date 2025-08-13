@@ -1,7 +1,12 @@
 import mongoose, { Schema } from "mongoose";
 
 const grievanceSchema = new Schema({
-  user: {
+  by: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  against: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,

@@ -64,7 +64,7 @@ export default function Navbar() {
   const { data: session } = useSession();
 
   return (
-    <div className="flex items-center justify-between w-full p-4 border-b">
+    <div className="flex items-center justify-between w-full p-4 border-b fixed">
       <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>

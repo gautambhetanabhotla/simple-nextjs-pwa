@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]/route";
 import User from "@/models/user";
 import connectToDatabase from "@/lib/mongodb";
 import { hash } from "bcryptjs";
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest) {
           message: (e as Error).message,
         },
         {
-          status: 400, // Bad Request
+          status: 400,
         },
       );
     } else if ((e as Error).name === "MongoServerError") {
@@ -39,13 +41,42 @@ export async function POST(request: NextRequest) {
           message: "Email already exists",
         },
         {
-          status: 409, // Conflict
+          status: 409,
         },
       );
     }
     return NextResponse.json(
       {
         message: (e as Error).message || "Something went wrong",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
+}
+
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json(
+      {
+        message: "Unauthorized",
+      },
+      {
+        status: 401,
+      },
+    );
+  }
+  await connectToDatabase();
+  try {
+    const users = await User.find({}, "-passwordHash");
+    return NextResponse.json(users);
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json(
+      {
+        message: "Failed to fetch users",
       },
       {
         status: 500, // Internal Server Error

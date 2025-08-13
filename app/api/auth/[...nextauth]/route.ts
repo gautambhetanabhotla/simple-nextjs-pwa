@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import User from "@/models/user";
@@ -8,7 +9,7 @@ if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("Please define the NEXTAUTH_SECRET environment variable");
 }
 
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Grievance portal",
@@ -58,7 +59,7 @@ const handler = NextAuth({
     },
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
     maxAge: 24 * 60 * 60, // in seconds
   },
   pages: {
@@ -66,6 +67,8 @@ const handler = NextAuth({
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
