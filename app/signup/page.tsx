@@ -1,6 +1,6 @@
 "use client";
 
-// import { useState } from "react";
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -152,7 +152,7 @@ function SignupForm() {
   );
 }
 
-export default function SignupPage() {
+function SignupPage() {
   // const [email, setEmail] = useState("");
   // const [password, setPassword] = useState("");
   // const [loading, setLoading] = useState(false);
@@ -196,5 +196,13 @@ export default function SignupPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense>
+      <SignupPage />
+    </Suspense>
   );
 }
