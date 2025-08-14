@@ -46,7 +46,7 @@ export default function Home() {
       })
       .then((data) => {
         setAllUsers(data);
-        console.dir(data);
+        // console.dir(data);
       });
     return () => clearTimeout(timer);
   }, [status, router]);
@@ -96,7 +96,9 @@ export default function Home() {
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>Photo attachment coming soon!</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  Photo attachment coming soon!
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>From camera</DropdownMenuItem>
                 <DropdownMenuItem>From gallery</DropdownMenuItem>

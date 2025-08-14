@@ -19,6 +19,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Grievance portal",
   description: "A portal for managing grievances",
+  icons: {
+    icon: "/favicon-96x96.png",
+    shortcut: "/favicon-96x96.png",
+    apple: "/favicon-192x192.png",
+  },
 };
 
 export default function RootLayout({

@@ -47,7 +47,7 @@ export default function Combobox(props: {
         <Command>
           <CommandInput placeholder="Search for users" />
           <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandEmpty>No results</CommandEmpty>
             <CommandGroup>
               {props.items.map((item, index) => (
                 <CommandItem
