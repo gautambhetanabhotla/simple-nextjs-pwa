@@ -8,6 +8,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -35,7 +37,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setManualLoading(false);
-    }, 3000);
+    }, 0);
     if (status === "unauthenticated") router.push("/login");
     fetch("/api/user")
       .then((res) => {
@@ -89,17 +91,13 @@ export default function Home() {
           <div className="absolute bottom-2 right-2 flex items-center justify-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger>
-                {/* <Button
-                  variant="ghost"
-                  // className="absolute bottom-0 right-2"
-                  size="icon"
-                > */}
                 <div>
                   <CameraIcon />
                 </div>
-                {/* </Button> */}
               </DropdownMenuTrigger>
               <DropdownMenuContent>
+                <DropdownMenuLabel>Photo attachment coming soon!</DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem>From camera</DropdownMenuItem>
                 <DropdownMenuItem>From gallery</DropdownMenuItem>
               </DropdownMenuContent>

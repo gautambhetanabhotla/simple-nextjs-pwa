@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import Grievance from "@/models/grievance";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/authoptions";
+import mongoose from "mongoose";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -14,7 +15,11 @@ export async function GET() {
     const [byYou, againstYou] = await Promise.all([
       Grievance.aggregate([
         {
-          $match: { by: session.user.id },
+          $match: {
+            by: mongoose.Types.ObjectId.createFromHexString(session.user.id),
+          },
+        },
+        {
           $lookup: {
             from: "users",
             localField: "against",
@@ -22,10 +27,31 @@ export async function GET() {
             as: "againstName",
           },
         },
-      ]),
+        {
+          $unwind: "$againstName",
+        },
+        {
+          $project: {
+            _id: 1,
+            by: 1,
+            against: 1,
+            text: 1,
+            image: 1,
+            againstName: {
+              name: 1,
+            },
+          },
+        },
+      ]).exec(),
       Grievance.aggregate([
         {
-          $match: { against: session.user.id },
+          $match: {
+            against: mongoose.Types.ObjectId.createFromHexString(
+              session.user.id,
+            ),
+          },
+        },
+        {
           $lookup: {
             from: "users",
             localField: "by",
@@ -33,15 +59,30 @@ export async function GET() {
             as: "byName",
           },
         },
-      ]),
+        {
+          $unwind: "$byName",
+        },
+        {
+          $project: {
+            _id: 1,
+            by: 1,
+            against: 1,
+            text: 1,
+            image: 1,
+            byName: {
+              name: 1,
+            },
+          },
+        },
+      ]).exec(),
     ]);
-    return NextResponse.json({
+    const result = {
       byYou: byYou.map((g) => {
         return {
           ...g,
           against: {
-            id: g.against,
-            name: g.againstName,
+            _id: g.against,
+            name: g.againstName.name,
           },
         };
       }),
@@ -49,12 +90,14 @@ export async function GET() {
         return {
           ...g,
           by: {
-            id: g.by,
-            name: g.byName,
+            _id: g.by,
+            name: g.byName.name,
           },
         };
       }),
-    });
+    };
+    // console.dir(result);
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error fetching grievances:", error);
     return NextResponse.error();
