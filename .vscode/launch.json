@@ -11,7 +11,35 @@
       "name": "Next.js: debug client-side",
       "type": "chrome",
       "request": "launch",
-      "url": "http://localhost:3000"
+      "url": "http://localhost:3000",
+      "runtimeArgs": [
+        "--ignore-certificate-errors",
+        "--ignore-ssl-errors",
+        "--ignore-certificate-errors-spki-list",
+        "--ignore-certificate-errors-ssl-errors",
+        "--allow-running-insecure-content",
+        "--disable-web-security",
+        "--allow-insecure-localhost"
+      ]
+    },
+    {
+      "name": "Next.js: debug client-side (HTTPS)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "https://localhost:3000",
+      "runtimeArgs": [
+        "--ignore-certificate-errors",
+        "--ignore-ssl-errors",
+        "--ignore-certificate-errors-spki-list",
+        "--ignore-certificate-errors-ssl-errors",
+        "--allow-running-insecure-content",
+        "--disable-web-security",
+        "--allow-insecure-localhost",
+        "--user-data-dir=${workspaceFolder}/.chrome-dev-session",
+        "--disable-features=VizDisplayCompositor",
+        "--disable-web-security",
+        "--unsafely-treat-insecure-origin-as-secure=http://localhost:3000"
+      ]
     },
     {
       "name": "Next.js: debug full stack",
@@ -28,6 +56,15 @@
         "uriFormat": "%s",
         "webRoot": "${workspaceFolder}"
       }
+    },
+  ],
+  "compounds": [
+    {
+      "name": "Next.js: Full Stack (HTTPS)",
+      "configurations": [
+        "Next.js: debug server-side",
+        "Next.js: debug client-side (HTTPS)"
+      ]
     }
   ]
 }
