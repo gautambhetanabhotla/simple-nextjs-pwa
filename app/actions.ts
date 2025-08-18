@@ -3,26 +3,28 @@
 import webpush from "web-push";
 
 webpush.setVapidDetails(
-  "mailto:your-email@example.com",
+  "mailto:gautamarcturus@gmail.com",
   process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
   process.env.VAPID_PRIVATE_KEY!,
 );
 
-// Use the web-push library's PushSubscription type
-let subscription: webpush.PushSubscription | null = null;
+let subscription: PushSubscription | null = null;
 
-export async function subscribeUser(sub: PushSubscription) {
-  // Convert browser PushSubscription to web-push PushSubscription format
-  const p256dh = sub.getKey ? sub.getKey("p256dh") : null;
-  const auth = sub.getKey ? sub.getKey("auth") : null;
-
-  subscription = {
+function PStoWPPS(sub: PushSubscription): webpush.PushSubscription {
+  return {
     endpoint: sub.endpoint,
+    expirationTime: sub.expirationTime,
     keys: {
-      p256dh: p256dh ? Buffer.from(p256dh).toString("base64url") : "",
-      auth: auth ? Buffer.from(auth).toString("base64url") : "",
+      // @ts-expect-error - TypeScript messes up type checking for PushSubscription and webpush.PushSubscription
+      p256dh: sub.keys.p256dh,
+      // @ts-expect-error - Same as before
+      auth: sub.keys.auth,
     },
   };
+}
+
+export async function subscribeUser(sub: PushSubscription) {
+  subscription = sub;
   // In a production environment, you would want to store the subscription in a database
   // For example: await db.subscriptions.create({ data: sub })
   return { success: true };
@@ -42,7 +44,7 @@ export async function sendNotification(message: string) {
 
   try {
     await webpush.sendNotification(
-      subscription,
+      PStoWPPS(subscription),
       JSON.stringify({
         title: "Test Notification",
         body: message,
