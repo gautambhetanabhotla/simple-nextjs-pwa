@@ -1,6 +1,10 @@
 "use server";
 
 import webpush from "web-push";
+import mongoose from "mongoose";
+import Subscription from "@/models/pushsubscription";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authoptions";
 
 webpush.setVapidDetails(
   "mailto:gautamarcturus@gmail.com",
@@ -8,8 +12,11 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY!,
 );
 
-let subscription: PushSubscription | null = null;
-
+/**
+ * Convert a PushSubscription object to a webpush.PushSubscription object.
+ * @param sub - The PushSubscription object to convert.
+ * @returns The converted webpush.PushSubscription object.
+ */
 function PStoWPPS(sub: PushSubscription): webpush.PushSubscription {
   return {
     endpoint: sub.endpoint,
@@ -23,35 +30,55 @@ function PStoWPPS(sub: PushSubscription): webpush.PushSubscription {
   };
 }
 
-export async function subscribeUser(sub: PushSubscription) {
-  subscription = sub;
-  // In a production environment, you would want to store the subscription in a database
-  // For example: await db.subscriptions.create({ data: sub })
+export async function subscribeUser(sub: PushSubscription, userAgent: string) {
+  const session = await getServerSession(authOptions);
+  await Subscription.create({
+    ...sub,
+    user: mongoose.Types.ObjectId.createFromHexString(session!.user.id),
+    userAgent,
+  });
   return { success: true };
 }
 
-export async function unsubscribeUser() {
-  subscription = null;
-  // In a production environment, you would want to remove the subscription from the database
-  // For example: await db.subscriptions.delete({ where: { ... } })
+export async function unsubscribeUser(userAgent: string) {
+  const session = await getServerSession(authOptions);
+  await Subscription.deleteOne({
+    user: mongoose.Types.ObjectId.createFromHexString(session!.user.id),
+    userAgent,
+  });
   return { success: true };
 }
 
-export async function sendNotification(message: string) {
-  if (!subscription) {
-    throw new Error("No subscription available");
+export async function sendNotificationToUser(
+  id: mongoose.Types.ObjectId | string,
+  message: string,
+) {
+  if (typeof id === "string") {
+    id = mongoose.Types.ObjectId.createFromHexString(id);
+  }
+  const subscriptions = await Subscription.find({
+    user: id,
+  });
+  if (!subscriptions || subscriptions.length === 0) {
+    return;
   }
 
   try {
-    await webpush.sendNotification(
-      PStoWPPS(subscription),
-      JSON.stringify({
-        title: "Test Notification",
-        body: message,
-        icon: "/icon.png",
-      }),
+    const promises = await Promise.allSettled(
+      subscriptions.map((subscription) =>
+        webpush.sendNotification(
+          PStoWPPS(subscription),
+          JSON.stringify({
+            title: "Grievance portal",
+            body: message,
+            // icon: "/icon.png",
+          }),
+        ),
+      ),
     );
-    return { success: true };
+    return {
+      success: promises.every((p) => p.status === "fulfilled"),
+    };
   } catch (error) {
     console.error("Error sending push notification:", error);
     return { success: false, error: "Failed to send notification" };

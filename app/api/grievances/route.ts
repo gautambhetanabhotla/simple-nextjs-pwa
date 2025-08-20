@@ -4,6 +4,7 @@ import Grievance from "@/models/grievance";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/authoptions";
 import mongoose from "mongoose";
+import { sendNotificationToUser } from "@/app/actions";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -98,21 +99,38 @@ export async function GET() {
     };
     // console.dir(result);
     return NextResponse.json(result);
-  } catch (error) {
-    console.error("Error fetching grievances:", error);
+  } catch {
+    // console.error("Error fetching grievances:", error);
     return NextResponse.error();
   }
 }
 
 export async function POST(request: Request) {
   await connectToDatabase();
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
   try {
     const body = await request.json();
-    const grievance = new Grievance(body);
-    await grievance.save();
-    return NextResponse.json({}, { status: 201 });
+    if (!body.against) {
+      return NextResponse.json(
+        { message: "Select someone to post a grievance against." },
+        { status: 400 },
+      );
+    }
+    const grievance = new Grievance({
+      ...body,
+      by: session.user.id,
+    });
+    const g = await grievance.save();
+    sendNotificationToUser(
+      g.against,
+      `${session.user.name} posted a grievance against you!`,
+    );
+    return NextResponse.json({ _id: g._id }, { status: 201 });
   } catch (error) {
     console.error("Error creating grievance:", error);
-    return NextResponse.error();
+    return NextResponse.json({}, { status: 500 });
   }
 }

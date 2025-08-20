@@ -17,8 +17,8 @@ import Loader from "@/components/loader";
 import { CameraIcon, ArrowUp } from "lucide-react";
 import { toast } from "sonner";
 import Combobox from "@/components/ui/combobox";
-import PushNotificationManager from "@/components/pushnotifmanager";
-import PWAInstallPrompt from "@/components/pwainstallprompt";
+// import PushNotificationManager from "@/components/pushnotifmanager";
+// import PWAInstallPrompt from "@/components/pwainstallprompt";
 
 interface UserData {
   _id: string;
@@ -64,7 +64,7 @@ export default function Home() {
       method: "POST",
       body: JSON.stringify({
         text: description,
-        by: session!.user.id,
+        // by: session!.user.id,
         against: againstUserId,
       }),
       // headers: {
@@ -83,8 +83,8 @@ export default function Home() {
   return (
     <>
       <div className="min-h-screen w-full flex flex-col justify-center items-center gap-y-4">
-        <PushNotificationManager />
-        <PWAInstallPrompt />
+        {/* <PushNotificationManager />
+        <PWAInstallPrompt /> */}
         <p className="text-3xl px-5">What&apos;s bothering you today?</p>
         <div className="w-[85%] max-w-4xl relative">
           <Textarea

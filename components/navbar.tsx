@@ -38,7 +38,9 @@ function AvatarDropdown() {
         <DropdownMenuLabel>{session.user!.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>Profile</DropdownMenuItem>
-        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/settings")}>
+          Settings
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={() => signOut()}>
           Sign Out
