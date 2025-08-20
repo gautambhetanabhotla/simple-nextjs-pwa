@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function PWAInstallCard() {
+function PWAInstallCard() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { prompt, isIOS, isPWA, isInstallable, installabilityReason } =
@@ -113,7 +113,7 @@ export function PWAInstallCard() {
   );
 }
 
-export function PushNotificationsCard() {
+function PushNotificationsCard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [testMessage, setTestMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);

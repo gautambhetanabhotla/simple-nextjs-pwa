@@ -14,7 +14,7 @@ export function usePushNotifications() {
     null,
   );
   const [message, setMessage] = useState("");
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   function urlBase64ToUint8Array(base64String: string) {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
