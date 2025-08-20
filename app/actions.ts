@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import Subscription from "@/models/pushsubscription";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authoptions";
+import connectToDatabase from "@/lib/mongodb";
 
 webpush.setVapidDetails(
   "mailto:gautamarcturus@gmail.com",
@@ -32,6 +33,7 @@ function PStoWPPS(sub: PushSubscription): webpush.PushSubscription {
 
 export async function subscribeUser(sub: PushSubscription, userAgent: string) {
   const session = await getServerSession(authOptions);
+  await connectToDatabase();
   await Subscription.create({
     ...sub,
     user: mongoose.Types.ObjectId.createFromHexString(session!.user.id),
@@ -42,6 +44,7 @@ export async function subscribeUser(sub: PushSubscription, userAgent: string) {
 
 export async function unsubscribeUser(userAgent: string) {
   const session = await getServerSession(authOptions);
+  await connectToDatabase();
   await Subscription.deleteOne({
     user: mongoose.Types.ObjectId.createFromHexString(session!.user.id),
     userAgent,
@@ -56,6 +59,7 @@ export async function sendNotificationToUser(
   if (typeof id === "string") {
     id = mongoose.Types.ObjectId.createFromHexString(id);
   }
+  await connectToDatabase();
   const subscriptions = await Subscription.find({
     user: id,
   });
