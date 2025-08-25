@@ -41,6 +41,8 @@ export async function GET() {
             againstName: {
               name: 1,
             },
+            createdAt: 1,
+            updatedAt: 1,
           },
         },
       ]).exec(),
@@ -73,6 +75,8 @@ export async function GET() {
             byName: {
               name: 1,
             },
+            createdAt: 1,
+            updatedAt: 1,
           },
         },
       ]).exec(),

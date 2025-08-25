@@ -30,6 +30,8 @@ interface Grievance {
     | string;
   text: string;
   image?: Buffer | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 function GrievancesByYou({ grievances }: { grievances?: Grievance[] }) {
@@ -39,14 +41,25 @@ function GrievancesByYou({ grievances }: { grievances?: Grievance[] }) {
         <Card key={grievance._id}>
           <CardHeader>
             <CardTitle>
+              Against&nbsp;
               {typeof grievance.against === "object"
                 ? grievance.against.name
                 : grievance.against}
+              :
             </CardTitle>
           </CardHeader>
           <CardContent>
             <CardDescription>{grievance.text}</CardDescription>
           </CardContent>
+          {grievance.createdAt && (
+            <CardFooter>
+              <div className="w-full flex justify-between gap-8 items-center">
+                <p className="text-gray-600 text-xs">
+                  Posted {new Date(grievance.createdAt).toLocaleString()}
+                </p>
+              </div>
+            </CardFooter>
+          )}
         </Card>
       ))}
     </div>
@@ -75,7 +88,12 @@ function GrievancesAgainstYou({ grievances }: { grievances?: Grievance[] }) {
             <CardDescription>{grievance.text}</CardDescription>
           </CardContent>
           <CardFooter>
-            <div className="w-full">
+            <div className="w-full flex justify-between gap-8 items-center">
+              {grievance.createdAt && (
+                <p className="text-gray-600 text-xs">
+                  Posted {new Date(grievance.createdAt).toLocaleString()}
+                </p>
+              )}
               <CardAction>
                 <Button disabled size="sm">
                   <Reply className="mr-1" />
